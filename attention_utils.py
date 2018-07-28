@@ -1,5 +1,6 @@
 import keras.backend as K
 import numpy as np
+from keras.utils import plot_model
 
 
 def get_activations(model, inputs, print_shape_only=False, layer_name=None):
@@ -35,6 +36,8 @@ def get_data(n, input_dim, attention_column=1):
     """
     x = np.random.standard_normal(size=(n, input_dim))
     y = np.random.randint(low=0, high=2, size=(n, 1))
+
+    # yの先頭の値を attention_column とするテストデータを作る.
     x[:, attention_column] = y[:, 0]
     return x, y
 

@@ -2,10 +2,11 @@ from keras.layers import merge
 from keras.layers.core import *
 from keras.layers.recurrent import LSTM
 from keras.models import *
+from keras.utils import plot_model
 
 from attention_utils import get_activations, get_data_recurrent
 
-INPUT_DIM = 2
+INPUT_DIM = 200
 TIME_STEPS = 20
 # if True, the attention vector is shared across the input_dimensions where the attention is applied.
 SINGLE_ATTENTION_VECTOR = False
@@ -49,10 +50,11 @@ def model_attention_applied_before_lstm():
 
 if __name__ == '__main__':
 
-    N = 300000
-    # N = 300 -> too few = no training
+    #N = 300000
+    N = 300000 #-> too few = no training
     inputs_1, outputs = get_data_recurrent(N, TIME_STEPS, INPUT_DIM)
-
+    print(inputs_1[0],outputs[0]) 
+    
     if APPLY_ATTENTION_BEFORE_LSTM:
         m = model_attention_applied_before_lstm()
     else:
@@ -60,12 +62,23 @@ if __name__ == '__main__':
 
     m.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     print(m.summary())
+    plot_model(m, to_file='model_lstm.png',show_shapes=True)     
 
-    m.fit([inputs_1], outputs, epochs=1, batch_size=64, validation_split=0.1)
+    m.fit([inputs_1], outputs, epochs=2, batch_size=64, validation_split=0.1)
 
     attention_vectors = []
     for i in range(300):
         testing_inputs_1, testing_outputs = get_data_recurrent(1, TIME_STEPS, INPUT_DIM)
+
+        # attention_vec を指定して値を取り出している
+        # test = get_activations(m,
+        #     testing_inputs_1,
+        #     print_shape_only=True,
+        #     layer_name='attention_vec')
+        #print(test)
+        # print(len(test[0][0]))
+        # print(len(test[0][0][0]))
+        # print(np.mean(test[0], axis=2))
         attention_vector = np.mean(get_activations(m,
                                                    testing_inputs_1,
                                                    print_shape_only=True,
@@ -73,7 +86,7 @@ if __name__ == '__main__':
         print('attention =', attention_vector)
         assert (np.sum(attention_vector) - 1.0) < 1e-5
         attention_vectors.append(attention_vector)
-
+    print(len(attention_vectors))
     attention_vector_final = np.mean(np.array(attention_vectors), axis=0)
     # plot part.
     import matplotlib.pyplot as plt
