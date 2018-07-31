@@ -1,7 +1,7 @@
 import keras.backend as K
 import numpy as np
 from keras.utils import plot_model
-
+import random
 
 def get_activations(model, inputs, print_shape_only=False, layer_name=None):
     # Documentation is available online on Github at the address below.
@@ -42,7 +42,7 @@ def get_data(n, input_dim, attention_column=1):
     return x, y
 
 
-def get_data_recurrent(n, time_steps, input_dim, attention_column=10):
+def get_data_recurrent(n, time_steps, input_dim, attention_column=8):
     """
     Data generation. x is purely random except that it's first value equals the target y.
     In practice, the network should learn that the target = x[attention_column].
@@ -60,7 +60,14 @@ def get_data_recurrent(n, time_steps, input_dim, attention_column=10):
 
     x = np.random.standard_normal(size=(n, time_steps, input_dim))
     y = np.random.randint(low=information_nugget_value_min, high=(information_nugget_value_max+1), size=(n, 1))
+    attention_columns = []
     
     # TODO: attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認したい
-    x[:, attention_column, :] = np.tile(y[:]*information_nugget_value, (1, input_dim))
-    return x, y
+    print(len(x[:, attention_column, :]))
+    for i in range(len(x)):
+        #print(i)
+        this_attention_column = attention_column+random.randrange(2)
+        x[i, this_attention_column, :] = np.tile(y[i]*information_nugget_value, (1, input_dim))
+        attention_columns.append(this_attention_column)
+    #x[:, attention_column, :] = np.tile(y[:]*information_nugget_value, (1, input_dim))
+    return x, y, attention_columns
