@@ -6,7 +6,7 @@ from keras.utils import plot_model
 
 from attention_utils import get_activations, get_data_recurrent
 
-INPUT_DIM = 200
+INPUT_DIM = 2
 TIME_STEPS = 20
 # if True, the attention vector is shared across the input_dimensions where the attention is applied.
 SINGLE_ATTENTION_VECTOR = False
@@ -53,7 +53,11 @@ if __name__ == '__main__':
     #N = 300000
     N = 300000 #-> too few = no training
     inputs_1, outputs = get_data_recurrent(N, TIME_STEPS, INPUT_DIM)
-    print(inputs_1[0],outputs[0]) 
+    
+    # for debug
+    for ntest in [0, 1]:
+        print( len(inputs_1[ntest]), inputs_1[ntest], inputs_1[ntest][10] )
+        print( outputs[ntest] ) 
     
     if APPLY_ATTENTION_BEFORE_LSTM:
         m = model_attention_applied_before_lstm()
@@ -79,6 +83,8 @@ if __name__ == '__main__':
         # print(len(test[0][0]))
         # print(len(test[0][0][0]))
         # print(np.mean(test[0], axis=2))
+
+        # TODO: attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認したい
         attention_vector = np.mean(get_activations(m,
                                                    testing_inputs_1,
                                                    print_shape_only=True,

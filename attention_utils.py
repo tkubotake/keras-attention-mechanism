@@ -53,7 +53,14 @@ def get_data_recurrent(n, time_steps, input_dim, attention_column=10):
     :param attention_column: the column linked to the target. Everything else is purely random.
     :return: x: model inputs, y: model targets
     """
+
+    information_nugget_value = 1.3
+    information_nugget_value_max = 2
+    information_nugget_value_min = 0
+
     x = np.random.standard_normal(size=(n, time_steps, input_dim))
-    y = np.random.randint(low=0, high=2, size=(n, 1))
-    x[:, attention_column, :] = np.tile(y[:], (1, input_dim))
+    y = np.random.randint(low=information_nugget_value_min, high=(information_nugget_value_max+1), size=(n, 1))
+    
+    # TODO: attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認したい
+    x[:, attention_column, :] = np.tile(y[:]*information_nugget_value, (1, input_dim))
     return x, y
