@@ -102,6 +102,7 @@ if __name__ == '__main__':
                                                    print_shape_only=True,
                                                    layer_name='attention_vec')[0], axis=2).squeeze()
         print('attention =', attention_vector)
+        print('attention =', attention_vector[attention_columns[0]])
         assert (np.sum(attention_vector) - 1.0) < 1e-5
         attention_vectors.append(attention_vector)
 
