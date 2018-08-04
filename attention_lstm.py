@@ -134,8 +134,8 @@ if __name__ == '__main__':
             ax.set_xticklabels(x_labels,rotation = 90)
             #plt.subplots_adjust(bottom=1.0)
             plt.title('Attention Mechanism')
-            plt.savefig( 'out.png' )
-            quit()
+            plt.savefig( 'out'+str(i)+'.png' )
+            
     """
     print(len(attention_vectors))
     attention_vector_final = np.mean(np.array(attention_vectors), axis=0)
