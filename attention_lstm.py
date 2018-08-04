@@ -115,26 +115,22 @@ if __name__ == '__main__':
         assert (np.sum(attention_vector) - 1.0) < 1e-5
         #attention_vectors.append(attention_vector)
 
-        # attentionが貼られるべき information nuggetが入っている場合
+        fig, ax = plt.subplots()
+        answer = np.zeros(len(attention_vector))
+
+        # attentionが貼られるべき information nuggetが入っている場合 
         if(y.squeeze() == 1):
-            fig, ax = plt.subplots()
-            # pd.DataFrame(attention_vector, columns=['attention (%)']).plot(kind='bar',
-            #                                                              title='Attention Mechanism as '
-            #                                                                    'a function of input'
-            #                                                                    ' dimensions.')
-            #plt.xticks(x)
-            list_for_plot = np.zeros(len(attention_vector))
-            list_for_plot[attention_columns[0]] = 1
-            #print(list_for_plot)
+            answer[attention_columns[0]] = 1
+        #print(answer)
 
-            ax.bar(range(len(attention_vector)),list_for_plot,color="red",label="answer")
-            ax.bar(range(len(attention_vector)),attention_vector,color="blue",label="attention")
+        ax.bar(range(len(attention_vector)),answer,color="red",label="answer")
+        ax.bar(range(len(attention_vector)),attention_vector,color="blue",label="attention")
 
-            plt.xticks(range(len(attention_vector)))
-            ax.set_xticklabels(x_labels,rotation = 90)
-            #plt.subplots_adjust(bottom=1.0)
-            plt.title('Attention Mechanism')
-            plt.savefig( 'out'+str(i)+'.png' )
+        plt.xticks(range(len(attention_vector)))
+        ax.set_xticklabels(x_labels,rotation = 90)
+        #plt.subplots_adjust(bottom=1.0)
+        plt.title('Attention Mechanism')
+        plt.savefig( 'out'+str(i)+'.png' )
             
     """
     print(len(attention_vectors))
