@@ -124,8 +124,8 @@ if __name__ == '__main__':
             #                                                                    ' dimensions.')
             #plt.xticks(x)
             list_for_plot = np.zeros(len(attention_vector))
-            list_for_plot[attention_columns[0]+1] = 1
-            print(list_for_plot)
+            list_for_plot[attention_columns[0]] = 1
+            #print(list_for_plot)
 
             ax.bar(range(len(attention_vector)),list_for_plot,color="red",label="answer")
             ax.bar(range(len(attention_vector)),attention_vector,color="blue",label="attention")
