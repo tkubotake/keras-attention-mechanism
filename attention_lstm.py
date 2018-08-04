@@ -120,8 +120,8 @@ if __name__ == '__main__':
 
         # attentionが貼られるべき information nuggetが入っている場合 
         if(y.squeeze() == 1):
-            answer[attention_columns[0]] = 1
-        #print(answer)
+            answer[attention_columns[0]] = max(attention_vector)*2
+            print(answer)
 
         ax.bar(range(len(attention_vector)),answer,color="red",label="answer")
         ax.bar(range(len(attention_vector)),attention_vector,color="blue",label="attention")
@@ -130,8 +130,8 @@ if __name__ == '__main__':
         ax.set_xticklabels(x_labels,rotation = 90)
         #plt.subplots_adjust(bottom=1.0)
         plt.title('Attention Mechanism')
-        plt.savefig( 'out'+str(i)+'.png' )
-            
+        plt.savefig( 'out'+str(i)+'_need_attention'+str(y.squeeze())+'.png' )
+
     """
     print(len(attention_vectors))
     attention_vector_final = np.mean(np.array(attention_vectors), axis=0)
