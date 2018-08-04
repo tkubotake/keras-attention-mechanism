@@ -70,8 +70,8 @@ def get_data_recurrent(data_size, time_steps, input_dim, base_attention_column=5
     print(len(x[:, base_attention_column, :]))
     for i in range(len(x)):
         #print(i)
-        this_attention_column = base_attention_column+random.randrange(5)
-        # this_attention_column = base_attention_column
+        # this_attention_column = base_attention_column+random.randrange(5)
+        this_attention_column = base_attention_column
         # this_attention_column の場所に information nugget を配置する
         random_vec = [0.2]
         x[i, this_attention_column, :] = np.tile(y[i]*information_nugget_value if y[i] > 0 else random_vec[0], (1, input_dim))
