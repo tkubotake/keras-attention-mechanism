@@ -43,7 +43,7 @@ def get_data(n, input_dim, attention_column=1):
 
 # データを作成する
 # attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認できる
-def get_data_recurrent(n, time_steps, input_dim, base_attention_column=8):
+def get_data_recurrent(data_size, time_steps, input_dim, base_attention_column=5):
     """
     Data generation. x is purely random except that it's first value equals the target y.
     In practice, the network should learn that the target = x[attention_column].
@@ -55,21 +55,26 @@ def get_data_recurrent(n, time_steps, input_dim, base_attention_column=8):
     :return: x: model inputs, y: model targets
     """
 
-    information_nugget_value = 1.3
-    information_nugget_value_max = 2
+    information_nugget_value = 0.5
+    information_nugget_value_max = 1
     information_nugget_value_min = 0
 
-    x = np.random.standard_normal(size=(n, time_steps, input_dim))
-    y = np.random.randint(low=information_nugget_value_min, high=(information_nugget_value_max+1), size=(n, 1))
+    x = np.random.standard_normal(size=(data_size, time_steps, input_dim))
+    # data_size分のテストセットを作成(ランダムで、結果の0,1を決める)
+    y = np.random.randint(low=information_nugget_value_min, high=(information_nugget_value_max+1), size=(data_size, 1))
+    #print(y)
+
     attention_columns = []
     
     # attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認したい
     print(len(x[:, base_attention_column, :]))
     for i in range(len(x)):
         #print(i)
-        this_attention_column = base_attention_column+random.randrange(2)
+        this_attention_column = base_attention_column+random.randrange(5)
+        # this_attention_column = base_attention_column
         # this_attention_column の場所に information nugget を配置する
-        x[i, this_attention_column, :] = np.tile(y[i]*information_nugget_value, (1, input_dim))
+        random_vec = [0.2]
+        x[i, this_attention_column, :] = np.tile(y[i]*information_nugget_value if y[i] > 0 else random_vec[0], (1, input_dim))
         attention_columns.append(this_attention_column)
     #x[:, attention_column, :] = np.tile(y[:]*information_nugget_value, (1, input_dim))
     return x, y, attention_columns

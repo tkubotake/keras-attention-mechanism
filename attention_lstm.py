@@ -9,7 +9,7 @@ from attention_utils import get_activations, get_data_recurrent
 import matplotlib.pyplot as plt
 import pandas as pd
 
-INPUT_DIM = 2
+INPUT_DIM = 1
 TIME_STEPS = 20
 LSTM_UNITS = 32
 # if True, the attention vector is shared across the input_dimensions where the attention is applied.
@@ -81,7 +81,6 @@ if __name__ == '__main__':
     plot_model(m, to_file='model_lstm.png',show_shapes=True)     
 
     m.fit([inputs_1], outputs, epochs=1, batch_size=64, validation_split=0.1)
-
     attention_vectors = []
 
 
@@ -95,7 +94,9 @@ if __name__ == '__main__':
             x,
             print_shape_only=True,
             layer_name='attention_vec')
-        print(test)
+
+        predicted = m.predict(x)
+        
         # print(len(test[0][0]))
         # print(len(test[0][0][0]))
         # print(np.mean(test[0], axis=2))
@@ -115,13 +116,17 @@ if __name__ == '__main__':
         assert (np.sum(attention_vector) - 1.0) < 1e-5
         #attention_vectors.append(attention_vector)
 
+        # if(y.squeeze() == 1):
+        #     continue
+        
         fig, ax = plt.subplots()
+        ax.set_ylim([0,1.0])
         answer = np.zeros(len(attention_vector))
 
         # attentionが貼られるべき information nuggetが入っている場合 
         if(y.squeeze() == 1):
             answer[attention_columns[0]] = max(attention_vector)*2
-            print(answer)
+            #print(answer)
 
         ax.bar(range(len(attention_vector)),answer,color="red",label="answer")
         ax.bar(range(len(attention_vector)),attention_vector,color="blue",label="attention")
@@ -129,8 +134,10 @@ if __name__ == '__main__':
         plt.xticks(range(len(attention_vector)))
         ax.set_xticklabels(x_labels,rotation = 90)
         #plt.subplots_adjust(bottom=1.0)
-        plt.title('Attention Mechanism')
-        plt.savefig( 'out'+str(i)+'_need_attention'+str(y.squeeze())+'.png' )
+        plt.title('Attention Mechanism. predicted_y:'+str(predicted) + ', answer_y:'+str(y.squeeze()))
+        plt.savefig( 'out'+str(i)+'.png' )
+        #plt.show()
+        #quit()
 
     """
     print(len(attention_vectors))
