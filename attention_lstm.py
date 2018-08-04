@@ -6,6 +6,9 @@ from keras.utils import plot_model
 
 from attention_utils import get_activations, get_data_recurrent
 
+import matplotlib.pyplot as plt
+import pandas as pd
+
 INPUT_DIM = 2
 TIME_STEPS = 20
 LSTM_UNITS = 32
@@ -59,7 +62,7 @@ def model_attention_applied_before_lstm():
 if __name__ == '__main__':
 
     N = 300000
-    # N = 300 #-> too few = no training
+    #N = 300 #-> too few = no training
     inputs_1, outputs, attention_columns = get_data_recurrent(N, TIME_STEPS, INPUT_DIM)
     
     # for debug
@@ -80,43 +83,68 @@ if __name__ == '__main__':
     m.fit([inputs_1], outputs, epochs=1, batch_size=64, validation_split=0.1)
 
     attention_vectors = []
-    for i in range(300):
-        testing_inputs_1, testing_outputs, attention_columns = get_data_recurrent(1, TIME_STEPS, INPUT_DIM)
+
+
+    for i in range(50):
+
+        # 一つデータを生成する
+        x, y, attention_columns = get_data_recurrent(1, TIME_STEPS, INPUT_DIM)
 
         # attention_vec を指定して値を取り出している
-        # test = get_activations(m,
-        #     testing_inputs_1,
-        #     print_shape_only=True,
-        #     layer_name='attention_vec')
-        #print(test)
+        test = get_activations(m,
+            x,
+            print_shape_only=True,
+            layer_name='attention_vec')
+        print(test)
         # print(len(test[0][0]))
         # print(len(test[0][0][0]))
         # print(np.mean(test[0], axis=2))
 
-        # TODO: attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認したい
-        print("testing_inputs_1",testing_inputs_1)
-        print("testing_outputs",testing_outputs)
+        print("input",x.squeeze())
+        x_labels = [str(o) for o in x.squeeze()]
+        print(x_labels)
+        print("testing_outputs",y)
         print("attention_columns",attention_columns)
         attention_vector = np.mean(get_activations(m,
-                                                   testing_inputs_1,
+                                                   x,
                                                    print_shape_only=True,
                                                    layer_name='attention_vec')[0], axis=2).squeeze()
         print('attention =', attention_vector)
         # LSTMなのでAttentionの位置が一つずれる
-        print('attention =', attention_vector[attention_columns[0]+1])
+        print('attention =', attention_vector[attention_columns[0]])
         assert (np.sum(attention_vector) - 1.0) < 1e-5
-        attention_vectors.append(attention_vector)
+        #attention_vectors.append(attention_vector)
 
-        if(testing_outputs.squeeze() == 1):
+        # attentionが貼られるべき information nuggetが入っている場合
+        if(y.squeeze() == 1):
+            fig, ax = plt.subplots()
+            # pd.DataFrame(attention_vector, columns=['attention (%)']).plot(kind='bar',
+            #                                                              title='Attention Mechanism as '
+            #                                                                    'a function of input'
+            #                                                                    ' dimensions.')
+            #plt.xticks(x)
+            list_for_plot = np.zeros(len(attention_vector))
+            list_for_plot[attention_columns[0]+1] = 1
+            print(list_for_plot)
+
+            ax.bar(range(len(attention_vector)),list_for_plot,color="red",label="answer")
+            ax.bar(range(len(attention_vector)),attention_vector,color="blue",label="attention")
+
+            plt.xticks(range(len(attention_vector)))
+            ax.set_xticklabels(x_labels,rotation = 90)
+            #plt.subplots_adjust(bottom=1.0)
+            plt.title('Attention Mechanism')
+            plt.savefig( 'out.png' )
             quit()
+    """
     print(len(attention_vectors))
     attention_vector_final = np.mean(np.array(attention_vectors), axis=0)
     # plot part.
-    import matplotlib.pyplot as plt
-    import pandas as pd
+    
 
     pd.DataFrame(attention_vector_final, columns=['attention (%)']).plot(kind='bar',
                                                                          title='Attention Mechanism as '
                                                                                'a function of input'
                                                                                ' dimensions.')
     plt.show()
+    """

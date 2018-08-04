@@ -41,8 +41,9 @@ def get_data(n, input_dim, attention_column=1):
     x[:, attention_column] = y[:, 0]
     return x, y
 
-
-def get_data_recurrent(n, time_steps, input_dim, attention_column=8):
+# データを作成する
+# attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認できる
+def get_data_recurrent(n, time_steps, input_dim, base_attention_column=8):
     """
     Data generation. x is purely random except that it's first value equals the target y.
     In practice, the network should learn that the target = x[attention_column].
@@ -62,11 +63,11 @@ def get_data_recurrent(n, time_steps, input_dim, attention_column=8):
     y = np.random.randint(low=information_nugget_value_min, high=(information_nugget_value_max+1), size=(n, 1))
     attention_columns = []
     
-    # TODO: attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認したい
-    print(len(x[:, attention_column, :]))
+    # attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認したい
+    print(len(x[:, base_attention_column, :]))
     for i in range(len(x)):
         #print(i)
-        this_attention_column = attention_column+random.randrange(2)
+        this_attention_column = base_attention_column+random.randrange(2)
         x[i, this_attention_column, :] = np.tile(y[i]*information_nugget_value, (1, input_dim))
         attention_columns.append(this_attention_column)
     #x[:, attention_column, :] = np.tile(y[:]*information_nugget_value, (1, input_dim))
