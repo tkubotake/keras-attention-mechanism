@@ -9,12 +9,24 @@ def get_activations(model, inputs, print_shape_only=False, layer_name=None):
     print('----- activations -----')
     activations = []
     inp = model.input
+
+    # 任意レイヤーの重みを出力
     if layer_name is None:
         outputs = [layer.output for layer in model.layers]
     else:
         outputs = [layer.output for layer in model.layers if layer.name == layer_name]  # all layer outputs
+    
+    print("outputs",outputs) # [<tf.Tensor 'attention_vec/transpose:0' shape=(?, 20, 32) dtype=float32>]
+    print("inp",inp) # Tensor("input_1:0", shape=(?, 20, 1), dtype=float32)
+    # K.learning_phase(): これはテスト時か訓練時かを表すプレースホルダーです。最初に作成したモデルにはドロップアウトが含まれていますが、ドロップアウトは訓練時のみに適用され、テスト時には適用されません。そのため、テスト時か訓練時かを教えてあげる必要があります。
+    print("K.learning_phase()",K.learning_phase())
+    print([inp] + [K.learning_phase()])
+    # K.function で関数を作る
     funcs = [K.function([inp] + [K.learning_phase()], [out]) for out in outputs]  # evaluation functions
+    print(funcs[0])
     layer_outputs = [func([inputs, 1.])[0] for func in funcs]
+    #print(layer_outputs)
+    # quit()
     for layer_activations in layer_outputs:
         activations.append(layer_activations)
         if print_shape_only:
