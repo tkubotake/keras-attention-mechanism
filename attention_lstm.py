@@ -62,7 +62,7 @@ def model_attention_applied_before_lstm():
 if __name__ == '__main__':
 
     N = 300000
-    #N = 300 #-> too few = no training
+    # N = 300 #-> too few = no training
     inputs_1, outputs, attention_columns = get_data_recurrent(N, TIME_STEPS, INPUT_DIM)
     
     # for debug
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     m.fit([inputs_1], outputs, epochs=1, batch_size=64, validation_split=0.1)
     attention_vectors = []
 
-
+    
     for i in range(50):
 
         # 一つデータを生成する
@@ -106,11 +106,16 @@ if __name__ == '__main__':
         print(x_labels)
         print("testing_outputs",y)
         print("attention_columns",attention_columns)
+
+        # attention_vectorは、3番目の次元、例えば(1, 20, 32)なら 32 で平均を取ったもの。
         attention_vector = np.mean(get_activations(m,
                                                    x,
                                                    print_shape_only=True,
                                                    layer_name='attention_vec')[0], axis=2).squeeze()
+        print('attention.shape =', attention_vector.shape) # attention.shape = (20,)
+        #quit()
         print('attention =', attention_vector)
+        
         # LSTMなのでAttentionの位置が一つずれる
         print('attention =', attention_vector[attention_columns[0]])
         assert (np.sum(attention_vector) - 1.0) < 1e-5

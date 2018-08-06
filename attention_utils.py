@@ -3,7 +3,7 @@ import numpy as np
 from keras.utils import plot_model
 import random
 
-def get_activations(model, inputs, print_shape_only=False, layer_name=None):
+def get_activations(model, inputs, print_shape_only=True, layer_name=None):
     # Documentation is available online on Github at the address below.
     # From: https://github.com/philipperemy/keras-visualize-activations
     print('----- activations -----')
@@ -18,21 +18,33 @@ def get_activations(model, inputs, print_shape_only=False, layer_name=None):
     
     print("outputs",outputs) # [<tf.Tensor 'attention_vec/transpose:0' shape=(?, 20, 32) dtype=float32>]
     print("inp",inp) # Tensor("input_1:0", shape=(?, 20, 1), dtype=float32)
-    # K.learning_phase(): これはテスト時か訓練時かを表すプレースホルダーです。最初に作成したモデルにはドロップアウトが含まれていますが、ドロップアウトは訓練時のみに適用され、テスト時には適用されません。そのため、テスト時か訓練時かを教えてあげる必要があります。
-    print("K.learning_phase()",K.learning_phase())
-    print([inp] + [K.learning_phase()])
-    # K.function で関数を作る
+    
+    # K.function は特定の層（中間レイヤーの）出力をを取り出す
+    # K.learning_phase(): はテスト時か訓練時かを表すプレースホルダー。最初に作成したモデルにはドロップアウトが含まれているが
+    # ドロップアウトは訓練時のみに適用され、テスト時には適用されません。そのため、テスト時か訓練時かを教えてあげる必要があります。
+    # print("K.learning_phase()",K.learning_phase())
+    # print([inp] + [K.learning_phase()])
     funcs = [K.function([inp] + [K.learning_phase()], [out]) for out in outputs]  # evaluation functions
+    
+    # funcs[0]([inputs, 1.])で引数が２つなのは、上記のK.functionのinputの定義は２つだから.
+    print("funcs[0]([inputs, 1.])[0]:", funcs[0]([inputs, 0])[0] ) # K.learning_phase()へのinputは、テスト時には0で良い？
+    print(inputs) # TIME_STEPS次元
+    print(funcs) # 配列の要素数は1, [<keras.backend.tensorflow_backend.Function object at 0x11ca43b70>]
     print(funcs[0])
+    #quit()
+
+    # Keras function を実行する
     layer_outputs = [func([inputs, 1.])[0] for func in funcs]
+
     #print(layer_outputs)
-    # quit()
     for layer_activations in layer_outputs:
         activations.append(layer_activations)
         if print_shape_only:
-            print(layer_activations.shape)
+            print(layer_activations.shape) # (1, 20, 32)
         else:
             print(layer_activations)
+    
+    print(activations)
     return activations
 
 
@@ -67,7 +79,7 @@ def get_data_recurrent(data_size, time_steps, input_dim, base_attention_column=5
     :return: x: model inputs, y: model targets
     """
 
-    information_nugget_value = 0.5
+    information_nugget_value = 5
     information_nugget_value_max = 1
     information_nugget_value_min = 0
 
@@ -88,5 +100,7 @@ def get_data_recurrent(data_size, time_steps, input_dim, base_attention_column=5
         random_vec = [0.2]
         x[i, this_attention_column, :] = np.tile(y[i]*information_nugget_value if y[i] > 0 else random_vec[0], (1, input_dim))
         attention_columns.append(this_attention_column)
+    # print(max(x[0][0]))
+    
     #x[:, attention_column, :] = np.tile(y[:]*information_nugget_value, (1, input_dim))
     return x, y, attention_columns
