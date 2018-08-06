@@ -87,7 +87,7 @@ if __name__ == '__main__':
     for i in range(50):
 
         # 一つデータを生成する
-        x, y, attention_columns = get_data_recurrent(1, TIME_STEPS, INPUT_DIM)
+        x, y, attention_columns = get_data_recurrent(1, TIME_STEPS, INPUT_DIM, 6)
 
         # attention_vec を指定して値を取り出している
         test = get_activations(m,
