@@ -99,7 +99,7 @@ def get_data_recurrent(data_size, time_steps, input_dim, base_attention_column=5
         else:
             this_attention_column = base_attention_column
         # this_attention_column の場所に information nugget を配置する
-        random_vec = [0.2]
+        random_vec = [round((random.randrange(5)+1)*0.1,3) for i in range(input_dim)]
         x[i, this_attention_column, :] = np.tile(y[i]*information_nugget_value if y[i] > 0 else random_vec[0], (1, input_dim))
         attention_columns.append(this_attention_column)
     # print(max(x[0][0]))
