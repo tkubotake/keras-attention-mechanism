@@ -62,8 +62,8 @@ def model_attention_applied_before_lstm():
 if __name__ == '__main__':
 
     N = 300000
-    # N = 300 #-> too few = no training
-    inputs_1, outputs, attention_columns = get_data_recurrent(N, TIME_STEPS, INPUT_DIM)
+    #N = 300 #-> too few = no training
+    inputs_1, outputs, attention_columns = get_data_recurrent(N, TIME_STEPS, INPUT_DIM, 5)
     
     # for debug
     for ntest in [0, 1]:
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     for i in range(50):
 
         # 一つデータを生成する
-        x, y, attention_columns = get_data_recurrent(1, TIME_STEPS, INPUT_DIM)
+        x, y, attention_columns = get_data_recurrent(1, TIME_STEPS, INPUT_DIM, 5)
 
         # attention_vec を指定して値を取り出している
         test = get_activations(m,
@@ -117,20 +117,21 @@ if __name__ == '__main__':
         print('attention =', attention_vector)
         
         # LSTMなのでAttentionの位置が一つずれる
-        print('attention =', attention_vector[attention_columns[0]])
+        print('attention_vector =', attention_vector)
+        if(y.squeeze() == 1):
+            print('attention_columns =', attention_columns)
+            print('attention_columns[0][1] =', attention_columns[0][1])
+            print('attention =', attention_vector[attention_columns[0][1]])
         assert (np.sum(attention_vector) - 1.0) < 1e-5
         #attention_vectors.append(attention_vector)
 
-        # if(y.squeeze() == 1):
-        #     continue
-        
         fig, ax = plt.subplots()
         ax.set_ylim([0,1.0])
         answer = np.zeros(len(attention_vector))
 
         # attentionが貼られるべき information nuggetが入っている場合 
         if(y.squeeze() == 1):
-            answer[attention_columns[0]] = max(attention_vector)*2
+            answer[attention_columns[0][1]] = max(attention_vector)*2
             #print(answer)
 
         ax.bar(range(len(attention_vector)),answer,color="red",label="answer")
