@@ -84,6 +84,7 @@ def get_data_recurrent(data_size, time_steps, input_dim, base_attention_column=5
     information_nugget_value_min = 0
 
     x = np.random.standard_normal(size=(data_size, time_steps, input_dim))
+    x = np.round(x, 1)
     # data_size分のテストセットを作成(ランダムで、結果の0,1を決める)
     y = np.random.randint(low=information_nugget_value_min, high=(information_nugget_value_max+1), size=(data_size, 1))
     #print(y)
@@ -91,9 +92,11 @@ def get_data_recurrent(data_size, time_steps, input_dim, base_attention_column=5
     attention_columns = []
     
     for i in range(len(x)): # data_sizeイテレーション
-        # print(i)
-        this_attention_column = base_attention_column+random.randrange(random_position)
-        
+        print(i % random_position)
+        this_attention_column = base_attention_column + i % random_position if random_position > 0 else base_attention_column
+        # print(this_attention_column)
+        # print(random.randrange(random_position))
+
         if y[i] > 0:
             for target_dim in range(input_dim):
                 # this_attention_column の場所に information nugget を配置する
@@ -103,6 +106,6 @@ def get_data_recurrent(data_size, time_steps, input_dim, base_attention_column=5
     # attentionの位置を前後に揺らしてみたときに、attentionが正しく登場するかを確認
     print(x[:, base_attention_column, :])
     # print(attention_columns)
-    #quit()
+    # quit()
     
     return x, y, attention_columns
